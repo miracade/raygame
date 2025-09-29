@@ -62,8 +62,8 @@ void GsUpdatePlayerStats(GameScene* GS, GsPlayerStats* stats) {
   stats->sight_range = render_h / 2;
   stats->size = 12;
   stats->turn_speed = 2;
-  stats->magnetism_dist = 64;
-  stats->magnetism_frequency = INT_MAX;
+  stats->magnetism_dist = 96;
+  stats->magnetism_delay = 300;
   stats->shot_homing_percent = 0;
   stats->shot_homing_power = 0;
   stats->view_distance = 120;
@@ -120,10 +120,8 @@ void GsUpdatePlayerStats(GameScene* GS, GsPlayerStats* stats) {
           break;
         case ITEM_MAGNETISM_UP:
           stats->magnetism_dist += 16;
-          if (stats->magnetism_frequency == INT_MAX) {
-            stats->magnetism_frequency = 300;
-          } else {
-            stats->magnetism_frequency = stats->magnetism_frequency * 4 / 5;
+          if (x > 0) {
+            stats->magnetism_delay = stats->magnetism_delay * 4 / 5;
           }
           break;
         case ITEM_HOMING_POWER:
@@ -214,7 +212,7 @@ void GsUpdatePlayerStats(GameScene* GS, GsPlayerStats* stats) {
   IntClamp(&stats->size, 10, 50);
   IntClamp(&stats->turn_speed, 1, 64);
   IntClamp(&stats->magnetism_dist, 0, stats->sight_range);
-  IntClamp(&stats->magnetism_frequency, 15, INT_MAX);
+  IntClamp(&stats->magnetism_delay, 15, INT_MAX);
   IntClamp(&stats->sight_range, 120, 240);
   IntClamp(&stats->view_distance, 120, 240);
   IntClamp(&stats->shot_homing_percent, 0, 100);
@@ -629,7 +627,7 @@ void GsUpdatePlayer(GameScene* GS) {
   // misc
   ++GS->player.ticks_since_last_shot;
   ++GS->player.ticks_since_magnetism;
-  if (GS->player.ticks_since_magnetism >= GS->player.stats.magnetism_frequency) {
+  if (GS->player.ticks_since_magnetism >= GS->player.stats.magnetism_delay) {
     GS->player.ticks_since_magnetism = 0;
   }
 }
@@ -1170,8 +1168,25 @@ void GsUpdateOlPickItem(GameScene* GS) {
   }
 }
 
-void GsUpdateOlStats(GameScene* GS) { return; }
-void GsUpdateOlItems(GameScene* GS) { return; }
+void GsUpdateOlStats(GameScene* GS) {
+  if (IsKeyPressed(KEY_D)) {
+    GS->curr_overlay = GS_OVERLAY_SETTINGS;
+  }
+}
+
+void GsUpdateOlSettings(GameScene* GS) {
+  if (IsKeyPressed(KEY_A)) {
+    GS->curr_overlay = GS_OVERLAY_STATS;
+  } else if (IsKeyPressed(KEY_D)) {
+    GS->curr_overlay = GS_OVERLAY_ITEMS;
+  }
+}
+
+void GsUpdateOlItems(GameScene* GS) {
+  if (IsKeyPressed(KEY_A)) {
+    GS->curr_overlay = GS_OVERLAY_SETTINGS;
+  }
+}
 
 void GsInit(GameScene* GS) {
   // for (int i = 0; i < ITEM_COUNT; ++i) GS->player.item_counts[i] = 1;
@@ -1220,6 +1235,10 @@ void GsUpdate(GameScene* GS) {
 
     case GS_OVERLAY_STATS: {
       GsUpdateOlStats(GS);
+    } break;
+
+    case GS_OVERLAY_SETTINGS: {
+      GsUpdateOlSettings(GS);
     } break;
 
     case GS_OVERLAY_ITEMS: {

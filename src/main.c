@@ -25,6 +25,7 @@ int main() {
   SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
   InitWindow(window_w, window_h, "raygame");
   SetTargetFPS(target_fps);
+  SetExitKey(KEY_DELETE);
   PerfInit();
 
   // Utility function from resource_dir.h to find the resources folder and set
@@ -44,26 +45,22 @@ int main() {
   RenderTexture2D canvas = LoadRenderTexture(render_w, render_h);
 
   while (!WindowShouldClose()) {
-    if (IsKeyPressed(KEY_F1)) {
+    if (IsKeyPressed(KEY_ESCAPE)) {
+      GD->GS.curr_overlay = (GD->GS.curr_overlay == GS_OVERLAY_NONE) ? GS_OVERLAY_SETTINGS : GS_OVERLAY_NONE;
+    }
+
+    else if (IsKeyPressed(KEY_F1)) {  // save/load states
       save_state = game_data;
     } else if (IsKeyPressed(KEY_F2)) {
       game_data = save_state;
 
-    } else if (IsKeyPressed(KEY_F3)) {
-      // show_stats = !show_stats;
-      if (GD->GS.curr_overlay == GS_OVERLAY_NONE) {
-        GD->GS.curr_overlay = GS_OVERLAY_STATS;
-      } else if (GD->GS.curr_overlay == GS_OVERLAY_STATS) {
-        GD->GS.curr_overlay = GS_OVERLAY_NONE;
-      }
-
-    } else if (IsKeyPressed(KEY_F4)) {
+    } else if (IsKeyPressed(KEY_F4)) {  // resize window
       window_scale = (window_scale % 6) + 1;
       window_w = render_w * window_scale;
       window_h = render_h * window_scale;
       SetWindowSize(window_w, window_h);
 
-    } else if (IsKeyPressed(KEY_F5)) {
+    } else if (IsKeyPressed(KEY_F5)) {  // alter game speed
       game_speed /= 2;
     } else if (IsKeyPressed(KEY_F6)) {
       if (game_speed < (1 << 8)) {
@@ -73,32 +70,9 @@ int main() {
         game_speed = 1;
       }
 
-    } else if (IsKeyPressed(KEY_F7)) {
-      // gain experience
-      // GD->GS.player.xp = 100;
+    } else if (IsKeyPressed(KEY_F7)) {  // level up
       ++GD->GS.player.level;
       ++GD->GS.player.upgrades_pending;
-
-    } else if (IsKeyPressed(KEY_F8)) {
-      // show_stats = !show_stats;
-      if (GD->GS.curr_overlay == GS_OVERLAY_NONE) {
-        GD->GS.curr_overlay = GS_OVERLAY_ITEMS;
-      } else if (GD->GS.curr_overlay == GS_OVERLAY_ITEMS) {
-        GD->GS.curr_overlay = GS_OVERLAY_NONE;
-      }
-
-    } else if (IsKeyPressed(KEY_F9)) {
-      for (int p = 0; p < LENGTHOF(GD->GS.pickups); ++p) {
-        if (GD->GS.pickups[p].exists) {
-          GD->GS.pickups[p].type = (GD->GS.pickups[p].type - 1 + ITEM_COUNT) % ITEM_COUNT;
-        }
-      }
-    } else if (IsKeyPressed(KEY_F10)) {
-      for (int p = 0; p < LENGTHOF(GD->GS.pickups); ++p) {
-        if (GD->GS.pickups[p].exists) {
-          GD->GS.pickups[p].type = (GD->GS.pickups[p].type + 1) % ITEM_COUNT;
-        }
-      }
 
     } else if (IsKeyPressed(KEY_MINUS) || IsKeyPressedRepeat(KEY_MINUS)) {
       GD->GS.camera.zoom -= 8;
