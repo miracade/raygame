@@ -261,6 +261,27 @@ typedef struct GsLineFx {
   Color color;
 } GsLineFx;
 
+typedef struct GsShapeFx {
+  bool exists;
+
+  fixed_t x;
+  fixed_t y;
+
+  int despawn_timer;
+
+  Color fg;
+  Color bg;
+
+  angle_t angle;
+  int rotation_amount;
+
+  int sides;
+
+  int size;
+  int grow_amount;
+
+} GsShapeFx;
+
 typedef struct GsXpOrb {
   bool exists;
 
@@ -326,6 +347,7 @@ typedef struct GameScene {
 
   GsTextFx text_fx[40];
   GsLineFx line_fx[40];
+  GsShapeFx shape_fx[40];
 
   GsXpOrb xp_orbs[80];
 

@@ -74,30 +74,6 @@ void GsDrawProjs(GameScene* GS) {
     DrawPoly(render_pos, sides, render_size, GS->ticks + p * 15, color);
     DrawPolyLinesEx(render_pos, sides, render_size, GS->ticks + p * 15, 2.0f, BLACK);
 
-    // DRAW SPLASH CIRCLE
-    if (GS->projs[p].splash_radius > 0 && GS->projs[p].ticks_since_last_hit == 0) {
-      // color of the splash
-      bool frost = GS->projs[p].frost_power > 0;
-      bool flame = GS->projs[p].flame_power > 0;
-      Color colors[2];
-      colors[0] = YELLOW;
-      colors[1] = ORANGE;
-      if (frost && flame) {
-        colors[0] = SKYBLUE;
-        colors[1] = RED;
-      } else if (frost) {
-        colors[0] = SKYBLUE;
-        colors[1] = BLUE;
-      } else if (flame) {
-        colors[0] = ORANGE;
-        colors[1] = RED;
-      }
-
-      DrawPolyLinesEx(render_pos, 10, GS->projs[p].splash_radius, 22.5f, (float)GS->projs[p].splash_radius, colors[0]);
-      DrawPolyLinesEx(render_pos, 10, 1, 22.5f, (float)GS->projs[p].splash_radius, colors[1]);
-      DrawPolyLinesEx(render_pos, 10, GS->projs[p].splash_radius, 22.5f, 1.0f, colors[1]);
-    }
-
     // debug info
     // DrawLine(render_pos.x, render_pos.y,
     //          render_pos.x + FixWhole(FixCos(GS->projs[p].move_angle) * GS->projs[p].move_speed * target_fps / fixed_factor / 4),
@@ -298,6 +274,30 @@ void GsDrawTextFx(GameScene* GS) {
     GetRenderCoords(GS, GS->text_fx[t].x, GS->text_fx[t].y, default_z, &rx, &ry);
     Vector2 render_pos = {rx, ry};
     DrawPrintf(render_pos.x - 3 * strlen(GS->text_fx[t].text), render_pos.y, GS->text_fx[t].color, "%s", GS->text_fx[t].text);
+  }
+}
+
+void GsDrawShapeFx(GameScene* GS) {
+  for (int s = 0; s < LENGTHOF(GS->shape_fx); ++s) {
+    if (!GS->shape_fx[s].exists) {
+      continue;
+    }
+    int rx, ry;
+    GetRenderCoords(GS, GS->shape_fx[s].x, GS->shape_fx[s].y, default_z, &rx, &ry);
+    Vector2 render_pos = {rx, ry};
+
+    // shape
+
+    int render_size = GetRenderLength(GS, GS->shape_fx[s].size, default_z);
+    if (render_size < 3) {
+      render_size = 3;
+    }
+    DrawPoly(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, GS->shape_fx[s].fg);
+    DrawPolyLinesEx(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, 2.0f, GS->shape_fx[s].bg);
+
+    // turn or grow the shape_fx
+    GS->shape_fx[s].angle += GS->shape_fx[s].rotation_amount;
+    GS->shape_fx[s].size += GS->shape_fx[s].grow_amount;
   }
 }
 
@@ -502,6 +502,7 @@ void GsDraw(GameScene* GS) {
   GsDrawUi(GS);
   GsDrawLineFx(GS);
   GsDrawTextFx(GS);
+  GsDrawShapeFx(GS);
 
   switch (GS->curr_overlay) {
     case GS_OVERLAY_NONE: {

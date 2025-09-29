@@ -281,6 +281,29 @@ int GsGetLineFxSlot(GameScene* GS) {
   return oldest_idx;
 }
 
+int GsGetShapeFxSlot(GameScene* GS) {
+  int oldest_idx = 0;
+  for (int s = 0; s < LENGTHOF(GS->shape_fx); ++s) {
+    if (!GS->shape_fx[s].exists) {
+      GS->shape_fx[s] = (GsShapeFx){0};
+      GS->shape_fx[s].exists = true;
+      GS->shape_fx[s].fg = BLACK;
+      GS->shape_fx[s].bg = BLACK;
+      return s;
+    }
+    if (GS->shape_fx[s].despawn_timer < GS->shape_fx[oldest_idx].despawn_timer) {
+      oldest_idx = s;
+    }
+  }
+
+  // force-override oldest line effect if there were no slots available
+  GS->shape_fx[oldest_idx] = (GsShapeFx){0};
+  GS->shape_fx[oldest_idx].exists = true;
+  GS->shape_fx[oldest_idx].fg = BLACK;
+  GS->shape_fx[oldest_idx].bg = BLACK;
+  return oldest_idx;
+}
+
 void GsSpawnXpOrb(GameScene* GS, fixed_t x, fixed_t y, int xp) {
   int furthest_idx = 0;
   int furthest_sqdist = 0;
@@ -1019,6 +1042,48 @@ void GsUpdateProjs(GameScene* GS) {
           }
           GsDamageShape(GS, ss, p, GS->projs[p].splash_damage);
         }
+
+        // create splash shape fx
+
+        // color of the splash
+        bool frost = GS->projs[p].frost_power > 0;
+        bool flame = GS->projs[p].flame_power > 0;
+        Color colors[2];
+        colors[0] = YELLOW;
+        colors[1] = ORANGE;
+        if (frost && flame) {
+          colors[0] = SKYBLUE;
+          colors[1] = RED;
+        } else if (frost) {
+          colors[0] = SKYBLUE;
+          colors[1] = BLUE;
+        } else if (flame) {
+          colors[0] = ORANGE;
+          colors[1] = RED;
+        }
+
+        colors[0].a = 128;
+        colors[1].a = 128;
+
+        // position of the splash
+        int rx, ry;
+        GetRenderCoords(GS, GS->projs[p].x, GS->projs[p].y, default_z, &rx, &ry);
+        Vector2 render_pos = {rx, ry};
+
+        // shapefx
+
+        int s = GsGetShapeFxSlot(GS);
+        GS->shape_fx[s].x = GS->projs[p].x;
+        GS->shape_fx[s].y = GS->projs[p].y;
+        GS->shape_fx[s].despawn_timer = 3;
+        GS->shape_fx[s].size = GS->projs[p].splash_radius / 3;
+        GS->shape_fx[s].grow_amount = GS->projs[p].splash_radius / 3;
+        GS->shape_fx[s].rotation_amount = 83;
+        GS->shape_fx[s].sides = 5;
+
+        // DrawPolyLinesEx(render_pos, 10, GS->projs[p].splash_radius, 22.5f, (float)GS->projs[p].splash_radius, colors[0]);
+        // DrawPolyLinesEx(render_pos, 10, 1, 22.5f, (float)GS->projs[p].splash_radius, colors[1]);
+        // DrawPolyLinesEx(render_pos, 10, GS->projs[p].splash_radius, 22.5f, 1.0f, colors[1]);
       }
 
       // do player dps tracking
@@ -1088,6 +1153,18 @@ void GsUpdateLineFx(GameScene* GS) {
     --GS->line_fx[t].despawn_timer;
     if (GS->line_fx[t].despawn_timer <= 0) {
       GS->line_fx[t].exists = false;
+    }
+  }
+}
+
+void GsUpdateShapeFx(GameScene* GS) {
+  for (int s = 0; s < LENGTHOF(GS->shape_fx); ++s) {
+    if (!GS->shape_fx[s].exists) {
+      continue;
+    }
+    --GS->shape_fx[s].despawn_timer;
+    if (GS->shape_fx[s].despawn_timer <= 0) {
+      GS->shape_fx[s].exists = false;
     }
   }
 }
@@ -1266,8 +1343,11 @@ void GsUpdate(GameScene* GS) {
       GsUpdateProjs(GS);
 
       GsUpdatePickups(GS);
+
       GsUpdateTextFx(GS);
       GsUpdateLineFx(GS);
+      GsUpdateShapeFx(GS);
+
       GsUpdateXpOrbs(GS);
       GsUpdateCamera(GS);
       ++GS->ticks;
