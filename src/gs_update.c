@@ -781,7 +781,7 @@ void GsSpawnSplitProjs(GameScene* GS, int p) {
   }
 }
 
-void damage_shape(GameScene* GS, int s, int p, int damage) {
+void GsDamageShape(GameScene* GS, int s, int p, int damage) {
   // damage the shape
   GS->shapes[s].hp -= damage;
   GS->shapes[s].ticks_since_damaged = 0;
@@ -996,7 +996,7 @@ void GsUpdateProjs(GameScene* GS) {
       GS->projs[p].ticks_since_last_hit = 0;
 
       // damage the targeted shape
-      damage_shape(GS, s, p, GS->projs[p].damage);
+      GsDamageShape(GS, s, p, GS->projs[p].damage);
 
       // splash damage
       if (GS->projs[p].splash_damage >= 0) {
@@ -1017,7 +1017,7 @@ void GsUpdateProjs(GameScene* GS) {
           if (ssqdist >= IntSq(GS->shapes[ss].size + GS->projs[p].splash_radius)) {
             continue;
           }
-          damage_shape(GS, ss, p, GS->projs[p].splash_damage);
+          GsDamageShape(GS, ss, p, GS->projs[p].splash_damage);
         }
       }
 
