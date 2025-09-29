@@ -113,6 +113,40 @@ typedef struct GsPlayer {
   int damage_history[60];
 } GsPlayer;
 
+typedef struct GsFriendly {
+  uint8_t id;
+
+  fixed_t x;
+  fixed_t y;
+  fixed_t move_speed;
+  angle_t angle;
+
+  fixed_t reload_progress;
+  fixed_t shot_progress;
+  int ticks_since_last_shot;
+
+  int damage_history[60];
+
+  bool exists;
+
+  int sides;
+  int size;
+  Color fg;
+  Color bg;
+
+  int contact_damage;
+
+  // if it has health
+  bool takes_damage;
+
+  int hp;
+  int max_hp;
+  int regen;
+  int ticks_since_damaged;
+  int i_frames;
+
+} GsFriendly;
+
 typedef enum GsShapeVariant {
   SHAPE_VARIANT_NONE,
   SHAPE_VARIANT_BIG,
@@ -306,6 +340,8 @@ typedef struct GameScene {
 
   GsShape shapes[200];
   int shape_count;
+
+  GsFriendly friendlies[40];
 
   GsProj projs[200];
   int orbital_proj_count;

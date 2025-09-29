@@ -174,6 +174,54 @@ void GsDrawShapes(GameScene* GS) {
 // hack
 int GsXpForLevelUp(GameScene* GS);
 
+void GsDrawFriendlies(GameScene* GS) {
+  for (int i = 0; i < LENGTHOF(GS->friendlies); ++i) {
+    if (!GS->friendlies[i].exists) {
+      continue;
+    }
+    int rx, ry;
+    GetRenderCoords(GS, GS->friendlies[i].x, GS->friendlies[i].y, default_z, &rx, &ry);
+    Vector2 render_pos = {rx, ry};
+
+    // shape
+    Color fg = (GS->friendlies[i].ticks_since_damaged >= 8) ? GS->friendlies[i].fg : WHITE;
+    Color bg = (GS->friendlies[i].ticks_since_damaged >= 8) ? GS->friendlies[i].bg : PINK;
+
+    int render_size = GetRenderLength(GS, GS->friendlies[i].size, default_z);
+    if (render_size < 3) {
+      render_size = 3;
+    }
+    DrawPoly(render_pos, GS->friendlies[i].sides, render_size, GS->friendlies[i].angle, fg);
+    DrawPolyLinesEx(render_pos, GS->friendlies[i].sides, render_size, GS->friendlies[i].angle, 2.0f, bg);
+
+    // healthbar
+    if (GS->friendlies[i].takes_damage && (GS->friendlies[i].hp < GS->friendlies[i].max_hp)) {
+      int bar_width = IntMin(render_w / 2, GetRenderLength(GS, GS->friendlies[i].max_hp / 20, default_z));
+      int filled_width = bar_width * GS->friendlies[i].hp / GS->friendlies[i].max_hp;
+      Color color = GREEN;
+      if (filled_width <= bar_width / 2) {
+        color = YELLOW;
+      }
+      if (filled_width <= bar_width / 4) {
+        color = RED;
+      }
+      DrawRectangle(render_pos.x - bar_width / 2, render_pos.y + render_size + 2, bar_width, 3, BLACK);
+      DrawRectangle(render_pos.x - bar_width / 2, render_pos.y + render_size + 2, filled_width, 3, color);
+    }
+
+    // debug info
+    // DrawPrintf(render_pos.x, render_pos.y, BLACK, "[%d]", i);
+    // DrawLine(render_pos.x, render_pos.y,
+    //          render_pos.x + FixWhole(FixCos(GS->shapes[i].move_angle) * GS->shapes[i].move_speed * target_fps / fixed_factor),
+    //          render_pos.y + FixWhole(FixSin(GS->shapes[i].move_angle) * GS->shapes[i].move_speed * target_fps / fixed_factor),
+    //          RED);
+    // DrawLine(render_pos.x, render_pos.y,
+    //          render_pos.x + FixWhole(FixCos(GS->shapes[i].kb_angle) * GS->shapes[i].kb_speed * target_fps / fixed_factor),
+    //          render_pos.y + FixWhole(FixSin(GS->shapes[i].kb_angle) * GS->shapes[i].kb_speed * target_fps / fixed_factor),
+    //          BLUE);
+  }
+}
+
 void GsDrawPlayer(GameScene* GS) {
   int rx, ry;
   GetRenderCoords(GS, GS->player.x, GS->player.y, default_z, &rx, &ry);
@@ -473,6 +521,7 @@ void GsDraw(GameScene* GS) {
   GsDrawProjs(GS);
   GsDrawShapes(GS);
   GsDrawPlayer(GS);
+  GsDrawFriendlies(GS);
   GsDrawPickups(GS);
   GsDrawXpOrbs(GS);
   GsDrawUi(GS);

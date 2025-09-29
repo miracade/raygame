@@ -561,6 +561,10 @@ void GsOfferUpgrade(GameScene* GS) {
   }
 }
 
+void GsUpdateFriendlies(GameScene* GS) {
+  // TODO
+}
+
 void GsUpdatePlayer(GameScene* GS) {
   // player movement
   GS->player.move_speed = GS->player.stats.max_move_speed;
@@ -1216,6 +1220,8 @@ void GsUpdate(GameScene* GS) {
       GsUpdateShapes(GS);
 
       GsUpdatePlayer(GS);
+
+      GsUpdateFriendlies(GS);
 
       GsSpawnNewProjs(GS);
       GsUpdateProjs(GS);
