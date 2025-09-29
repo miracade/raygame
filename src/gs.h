@@ -61,7 +61,7 @@ typedef union GsPlayerStats {
     int turn_speed;
 
     int magnetism_dist;
-    int magnetism_frequency;
+    int magnetism_delay;
     int shot_homing_percent;
     int shot_homing_power;
     int view_distance;
@@ -285,6 +285,7 @@ typedef enum GsOverlayType {
   GS_OVERLAY_NONE,
   GS_OVERLAY_PICK_ITEM,
   GS_OVERLAY_STATS,
+  GS_OVERLAY_SETTINGS,
   GS_OVERLAY_ITEMS,
 } GsOverlayType;
 

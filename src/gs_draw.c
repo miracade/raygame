@@ -388,53 +388,107 @@ void GsDrawOlPickItem(GameScene* GS) {
   DrawPrintf(ol_x + lh, ol_y + ol_h - lh * 3, GRAY, "W/S to select, \nSPACE to confirm");
 }
 
-void GsDrawOlStats(GameScene* GS) {
-  const int ol_x = render_w / 12;
-  const int ol_y = render_h / 12;
+void GsDrawOlPauseText(GameScene* GS) {
+  const char* title_text = "GAME PAUSED";
+  const char* tabs_text = "STATS         SETTINGS         ITEMS";
+  const char* stats_arrows = "^^^^^                               ";
+  const char* settings_arrows = "              ^^^^^^^^              ";
+  const char* items_arrows = "                               ^^^^^";
+  const int ol_x = render_w * 1 / 12;
+  const int ol_y = render_h * 1 / 12;
   const int ol_w = render_w * 10 / 12;
-  const int ol_h = render_h * 10 / 12;
-  const int lh = ft_height;  // line height
-  DrawRectangle(ol_x, ol_y, ol_w, ol_h, BROWN);
-  DrawRectangle(ol_x + 3, ol_y + 3, ol_w - 6, ol_h - 6, BEIGE);
-  DrawPrintf(ol_x + lh, ol_y + lh, BLACK, "Stats Screen");
+  const int ol_h = render_h * 3 / 12;
 
-  int l = 2;
-  for (int i = 0; i < STAT_COUNT / 2 + 4; ++i) {
-    DrawPrintf(ol_x + lh, ft_height * l + ol_y + 10, BLACK, "%s: %d", stat_names[i], GS->player.stats.as_int[i]);
-    ++l;
+  DrawRectangle(ol_x, ol_y, ol_w, ol_h, GRAY);
+  DrawRectangle(ol_x + 3, ol_y + 3, ol_w - 6, ol_h - 6, LIGHTGRAY);
+
+  DrawPrintf(render_w / 2 - (strlen(title_text) * ft_width / 2), ol_y + ft_height, BLACK, "%s", title_text);
+  DrawPrintf(render_w / 2 - (strlen(tabs_text) * ft_width / 2), ol_y + ft_height * 3, BLACK, "%s", tabs_text);
+  const char* arrows_to_print = stats_arrows;
+  if (GS->curr_overlay == GS_OVERLAY_SETTINGS) {
+    arrows_to_print = settings_arrows;
+  } else if (GS->curr_overlay == GS_OVERLAY_ITEMS) {
+    arrows_to_print = items_arrows;
   }
-  l = 2;
-  for (int i = STAT_COUNT / 2 + 4; i < STAT_COUNT; ++i) {
-    DrawPrintf(ol_x + lh + ol_w / 2, ft_height * l + ol_y + 10, BLACK, "%s: %d", stat_names[i], GS->player.stats.as_int[i]);
+  DrawPrintf(render_w / 2 - (strlen(arrows_to_print) * ft_width / 2), ol_y + ft_height * 4, BLACK, "%s", arrows_to_print);
+}
+
+void GsDrawOlStats(GameScene* GS) {
+  const char* stats_title_text = "STATS";
+  const int ol_x = render_w * 1 / 12;
+  const int ol_y = render_h * 3 / 12;
+  const int ol_w = render_w * 10 / 12;
+  const int ol_h = render_h * 8 / 12;
+  const int lh = ft_height;  // line height
+  DrawRectangle(ol_x, ol_y, ol_w, ol_h, BLUE);
+  DrawRectangle(ol_x + 3, ol_y + 3, ol_w - 6, ol_h - 6, SKYBLUE);
+  DrawPrintf(render_w / 2 - (strlen(stats_title_text) * ft_width / 2), ol_y + lh, BLACK, "%s", stats_title_text);
+
+  // start printing on the left side, and move to the right side when we run out of room.
+  int stats_printed = 0;
+  bool right_side = false;
+  int l = 3;
+  for (int i = 0; i < STAT_COUNT; ++i) {
+    if (GS->player.stats.as_int[i] == 0) {
+      continue;  // Don't print stats equal to 0 to reduce clutter.
+    }
+    int x = (right_side) ? (render_w / 2) : (ol_x + lh);
+    int y = ft_height * l + ol_y;
+    DrawPrintf(x, y, BLACK, "%s: %d", stat_names[i], GS->player.stats.as_int[i]);
     ++l;
+    ++stats_printed;
+    if (stats_printed == 15) {
+      right_side = true;
+      l = 3;
+    }
   }
-  // DrawPrintf(0, 0, BLACK, "x: %d\ny: %d\nzoom: %d", GD->GS.camera.x, GD->GS.camera.y, GD->GS.camera.zoom);
+}
+
+void GsDrawOlSettings(GameScene* GS) {
+  const char* settings_title_text = "SETTINGS";
+  const int ol_x = render_w * 1 / 12;
+  const int ol_y = render_h * 3 / 12;
+  const int ol_w = render_w * 10 / 12;
+  const int ol_h = render_h * 8 / 12;
+  const int lh = ft_height;  // line height
+  DrawRectangle(ol_x, ol_y, ol_w, ol_h, DARKGRAY);
+  DrawRectangle(ol_x + 3, ol_y + 3, ol_w - 6, ol_h - 6, GRAY);
+  DrawPrintf(render_w / 2 - (strlen(settings_title_text) * ft_width / 2), ol_y + lh, BLACK, "%s", settings_title_text);
 }
 
 void GsDrawOlItems(GameScene* GS) {
-  const int ol_x = render_w / 12;
-  const int ol_y = render_h / 12;
+  const char* items_title_text = "ITEMS";
+  const int ol_x = render_w * 1 / 12;
+  const int ol_y = render_h * 3 / 12;
   const int ol_w = render_w * 10 / 12;
-  const int ol_h = render_h * 10 / 12;
+  const int ol_h = render_h * 8 / 12;
   const int lh = ft_height;  // line height
   DrawRectangle(ol_x, ol_y, ol_w, ol_h, BROWN);
   DrawRectangle(ol_x + 3, ol_y + 3, ol_w - 6, ol_h - 6, BEIGE);
-  DrawPrintf(ol_x + lh, ol_y + lh, BLACK, "Items Owned");
+  DrawPrintf(render_w / 2 - (strlen(items_title_text) * ft_width / 2), ol_y + lh, BLACK, "%s", items_title_text);
 
-  int items_to_list = 0;
-
+  // Start printing on the left side, and move to the right side when we run out of room.
+  int items_printed = 0;
+  bool right_side = false;
+  int l = 3;
   for (int i = 0; i < ITEM_COUNT; ++i) {
-    if (GS->player.item_counts[i] != 0) {
-      if (items_to_list <= 5) {
-        DrawPrintf(ol_x + lh, ft_height * items_to_list + ol_y + 30, BLACK, "%s: %d", item_strs[i], GS->player.item_counts[i]);
-      } else {
-        DrawPrintf(ol_x + lh + ol_w / 2, ft_height * (items_to_list - 5) + ol_y + 30, BLACK, "%s: %d", item_strs[i], GS->player.item_counts[i]);
-      }
-      ++items_to_list;
+    if (GS->player.item_counts[i] == 0) {
+      continue;  // Don't print items equal to 0 to reduce clutter.
+    }
+    int x = (right_side) ? (render_w / 2) : (ol_x + lh);
+    int y = ft_height * l + ol_y;
+    if (GS->player.item_counts[i] == 1) {
+      DrawPrintf(x, y, BLACK, "%s", item_strs[i]);
+    } else {
+      DrawPrintf(x, y, BLACK, "%s (x%d)", item_strs[i], GS->player.item_counts[i]);
+    }
+    ++l;
+    ++items_printed;
+    if (items_printed == 15) {
+      right_side = true;
+      l = 3;
     }
   }
-
-  // DrawPrintf(0, 0, BLACK, "x: %d\ny: %d\nzoom: %d", GD->GS.camera.x, GD->GS.camera.y, GD->GS.camera.zoom);
 }
 
 void GsDraw(GameScene* GS) {
@@ -458,11 +512,17 @@ void GsDraw(GameScene* GS) {
     } break;
 
     case GS_OVERLAY_STATS: {
+      GsDrawOlPauseText(GS);
       GsDrawOlStats(GS);
     } break;
 
-      // wip
+    case GS_OVERLAY_SETTINGS: {
+      GsDrawOlPauseText(GS);
+      GsDrawOlSettings(GS);
+    } break;
+
     case GS_OVERLAY_ITEMS: {
+      GsDrawOlPauseText(GS);
       GsDrawOlItems(GS);
     } break;
 
