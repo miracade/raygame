@@ -1075,11 +1075,13 @@ void GsUpdateProjs(GameScene* GS) {
         int s = GsGetShapeFxSlot(GS);
         GS->shape_fx[s].x = GS->projs[p].x;
         GS->shape_fx[s].y = GS->projs[p].y;
-        GS->shape_fx[s].despawn_timer = 3;
-        GS->shape_fx[s].size = GS->projs[p].splash_radius / 3;
+        GS->shape_fx[s].despawn_timer = 5;
+        GS->shape_fx[s].size = GS->projs[p].splash_radius / 2;
         GS->shape_fx[s].grow_amount = GS->projs[p].splash_radius / 3;
         GS->shape_fx[s].rotation_amount = 83;
         GS->shape_fx[s].sides = 5;
+        GS->shape_fx[s].bg = colors[0];
+        GS->shape_fx[s].fg = colors[1];
 
         // DrawPolyLinesEx(render_pos, 10, GS->projs[p].splash_radius, 22.5f, (float)GS->projs[p].splash_radius, colors[0]);
         // DrawPolyLinesEx(render_pos, 10, 1, 22.5f, (float)GS->projs[p].splash_radius, colors[1]);
@@ -1314,8 +1316,8 @@ void GsInit(GameScene* GS) {
   // GS->player.item_counts[ITEM_ORBITALS_UP] = 8;
   // GS->player.item_counts[ITEM_HOMING_POWER] = 8;
   // GS->player.item_counts[ITEM_SHOT_SPEED_UP] = 12;
-  // GS->player.item_counts[ITEM_FROST_SHOT] = 40;
-  // GS->player.item_counts[ITEM_FLAME_SHOT] = 6;
+  GS->player.item_counts[ITEM_FROST_SHOT] = 40;
+  GS->player.item_counts[ITEM_FLAME_SHOT] = 6;
   //  GS->player.item_counts[ITEM_MAGNETISM_UP] = 6;
   //  GS->player.item_counts[ITEM_SPIKE_SHIELD] = 4;
   //  GS->player.item_counts[ITEM_FIRE_RATE_UP] = 7;
@@ -1325,7 +1327,7 @@ void GsInit(GameScene* GS) {
   // GS->player.item_counts[ITEM_SIGHT_UP] = 3;
   //  GS->player.item_counts[ITEM_PIERCE_UP] = 30;
   //  GS->player.item_counts[ITEM_SPEED_UP] = 8;
-  // GS->player.item_counts[ITEM_SPLASH_DAMAGE] = 1;
+  GS->player.item_counts[ITEM_SPLASH_DAMAGE] = 3;
   GsUpdatePlayerStats(GS, &GS->player.stats);
   GS->player.hp = GS->player.stats.max_hp;
   GS->camera.zoom = FixNew(0, 128);
