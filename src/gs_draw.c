@@ -64,6 +64,7 @@ void GsDrawProjs(GameScene* GS) {
     int sides = 4;
     if (GS->projs[p].frost_power > 0) {
       sides = 10;
+      render_size = render_size * 3 / 4;
     }
     if (GS->projs[p].split_fragments > 0) {
       sides = 5;
@@ -292,8 +293,14 @@ void GsDrawShapeFx(GameScene* GS) {
     if (render_size < 3) {
       render_size = 3;
     }
-    DrawPoly(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, GS->shape_fx[s].fg);
-    DrawPolyLinesEx(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, 2.0f, GS->shape_fx[s].bg);
+
+    if (GS->shape_fx[s].alternate_colors && GS->ticks % 2 == 0) {
+      DrawPoly(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, GS->shape_fx[s].alternating_color);
+      DrawPolyLinesEx(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, 2.0f, GS->shape_fx[s].alternating_color);
+    } else {
+      DrawPoly(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, GS->shape_fx[s].fg);
+      DrawPolyLinesEx(render_pos, GS->shape_fx[s].sides, render_size, GS->shape_fx[s].angle, 2.0f, GS->shape_fx[s].bg);
+    }
 
     // turn or grow the shape_fx
     GS->shape_fx[s].angle += GS->shape_fx[s].rotation_amount;

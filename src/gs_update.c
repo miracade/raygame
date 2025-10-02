@@ -1048,22 +1048,16 @@ void GsUpdateProjs(GameScene* GS) {
         // color of the splash
         bool frost = GS->projs[p].frost_power > 0;
         bool flame = GS->projs[p].flame_power > 0;
-        Color colors[2];
-        colors[0] = YELLOW;
-        colors[1] = ORANGE;
+        Color splashfx = YELLOW;
         if (frost && flame) {
-          colors[0] = SKYBLUE;
-          colors[1] = RED;
+          splashfx = SKYBLUE;
+          GS->shape_fx[s].alternate_colors = true;
+          GS->shape_fx[s].alternating_color = ORANGE;
         } else if (frost) {
-          colors[0] = SKYBLUE;
-          colors[1] = BLUE;
+          splashfx = SKYBLUE;
         } else if (flame) {
-          colors[0] = ORANGE;
-          colors[1] = RED;
+          splashfx = ORANGE;
         }
-
-        colors[0].a = 128;
-        colors[1].a = 128;
 
         // position of the splash
         int rx, ry;
@@ -1077,11 +1071,11 @@ void GsUpdateProjs(GameScene* GS) {
         GS->shape_fx[s].y = GS->projs[p].y;
         GS->shape_fx[s].despawn_timer = 5;
         GS->shape_fx[s].size = GS->projs[p].splash_radius / 2;
-        GS->shape_fx[s].grow_amount = GS->projs[p].splash_radius / 3;
+        GS->shape_fx[s].grow_amount = GS->projs[p].splash_radius / 4;
         GS->shape_fx[s].rotation_amount = 83;
         GS->shape_fx[s].sides = 5;
-        GS->shape_fx[s].bg = colors[0];
-        GS->shape_fx[s].fg = colors[1];
+        GS->shape_fx[s].fg.a = 0;
+        GS->shape_fx[s].bg = splashfx;
 
         // DrawPolyLinesEx(render_pos, 10, GS->projs[p].splash_radius, 22.5f, (float)GS->projs[p].splash_radius, colors[0]);
         // DrawPolyLinesEx(render_pos, 10, 1, 22.5f, (float)GS->projs[p].splash_radius, colors[1]);

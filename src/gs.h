@@ -272,6 +272,9 @@ typedef struct GsShapeFx {
   Color fg;
   Color bg;
 
+  bool alternate_colors;
+  Color alternating_color;
+
   angle_t angle;
   int rotation_amount;
 
